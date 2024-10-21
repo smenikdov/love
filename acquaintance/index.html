@@ -1,17 +1,181 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="style.css">
-    <title>title</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Знакомство</title>
   </head>
+
   <body>
-    <div class="background"></div>
     <div id="app"></div>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script crossorigin type="text/javascript" src="https://unpkg.com/babel-standalone@6/babel.js"></script>
-    <script type="text/babel" src="script.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/babel-standalone@6/babel.js"></script>
+
+    <script type="text/babel">
+      var data = {
+        headerText: "Знакмоство",
+        userMessages: [
+          { text: 'Привет', isShe: true },
+          { text: 'Где то я тебя будто уже видела', isShe: true },
+          { text: 'Привет) А я тебя точно не видел раньше) а еще никогда не видел девушку, которая пишет первой) Вы случайно не маньяк?)', isShe: false },
+        ],
+      };
+
+      class App extends React.Component {
+        constructor(props) {
+          super(props);
+
+          this.state = data;
+        }
+
+        updateUserMessages = newMessage => {
+          if (!newMessage){
+            return;  
+          }
+          
+          var updatedMessages = this.state.userMessages;
+
+          var updatedBotMessages = this.state.botMessages;
+
+          this.setState({
+            userMessages: updatedMessages.concat(newMessage),
+          });
+        };
+
+        scrollBubble = element => {
+          if (element != null) {
+            element.scrollIntoView(true);
+          }
+        };
+
+        showMessages = () => {
+          var allMessages = [];
+          const userMessages = this.state.userMessages;
+        
+          for (let i = 0; i < userMessages.length; i++) {
+            if (userMessages[i].isShe) {
+              allMessages.push(
+                <BotBubble message={userMessages[i].text} thisRef={this.scrollBubble} />
+              );
+            } else {
+              allMessages.push(
+                <UserBubble message={userMessages[i].text} thisRef={this.scrollBubble} />
+              );
+            }
+          }
+
+          return <div className="msg-container">{allMessages}</div>;
+        };
+
+        onInput = event => {
+          if (event.key === "Enter") {
+            var userInput = event.target.value;
+
+            this.updateUserMessages(userInput);
+            event.target.value = "";
+          }
+          
+          if (event.target.value!=""){
+            event.target.parentElement.style.background = 'rgba(69,58,148,0.6)';
+          }
+          else{
+            event.target.parentElement.style.background = 'rgba(255, 255, 255, 0.6)';
+          }
+        };
+
+        onClick = () => {
+          var inp = document.getElementById("chat");
+          var userInput = inp.value;
+
+          this.updateUserMessages(userInput);
+          inp.value = "";
+        };
+
+        render() {
+          return (
+            <div className="app-container">
+              <Header
+                headerText={this.state.headerText}
+                pText={this.state.pText}
+                p2Text={this.state.p2Text}
+              />
+              <div className="chat-container">
+                <ChatHeader />
+                {this.showMessages()}
+                <UserInput onInput={this.onInput} onClick={this.onClick} />
+              </div>
+            </div>
+          );
+        }
+      }
+
+      class UserBubble extends React.Component {
+        render() {
+          return (
+            <div className="user-message-container" ref={this.props.thisRef}>
+              <div className="chat-bubble user">
+                {this.props.message}
+              </div>
+            </div>
+          );
+        }
+      }
+
+      class BotBubble extends React.Component {
+        render() {
+          return (
+            <div className="bot-message-container" ref={this.props.thisRef}>
+              <div className="chat-bubble bot">
+                {this.props.message}
+              </div>
+            </div>
+          );
+        }
+      }
+
+      var Header = props => {
+        return (
+          <div className="header">
+            <div className="header-img" />
+            <h1> {props.headerText} </h1>
+            <h2> {props.pText} </h2>
+            <p> {props.p2Text} </p>
+          </div>
+        );
+      };
+
+      var ChatHeader = props => {
+        return (
+          <div className="chat-header">
+            <div className="dot" />
+            <div className="dot" />
+            <div className="dot" />
+          </div>
+        );
+      };
+
+      var UserInput = props => {
+        return (
+          <div className="input-container">
+            <input
+              id="chat"
+              type="text"
+              readonly="readonly"
+              placeholder="напиши ей что-нибудь"
+            />
+            <button className="input-submit" />
+          </div>
+        );
+      };
+      ReactDOM.render(<App />, document.getElementById("app"));
+
+</script>
+
   </body>
+
 </html>
+
+
