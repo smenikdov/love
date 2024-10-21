@@ -282,11 +282,22 @@ a {
 
 }
 
-@media screen and (min-width: 400px ?? max-width: 660px) {
-
+@media screen and (min-width: 660px) {
   .direction-l .desc,
   .direction-r .desc {
     margin: 1em 4em 0 4em;
   }
+}
 
+@media screen and (max-width: 660px) {
+  .direction-l .desc,
+  .direction-r .desc {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .flag-wrapper {
+    width: 100%;
+  }
 }
