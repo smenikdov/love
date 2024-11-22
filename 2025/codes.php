@@ -16,10 +16,6 @@ $codes = [
     ['code' => '0450', 'availableFrom' => new DateTime('2025-12-01', new DateTimeZone('Asia/Yekaterinburg'))],
 ];
 
-// возвращает номер месяца (1–12)
-$currentMonth = date('n');
-
-// $currentTime = date('Y-m-d H:i:s');
 $currentTime = new DateTime('now', new DateTimeZone('Asia/Yekaterinburg'));
 
 $filteredCodes = array_map(function ($item) use ($currentTime) {
