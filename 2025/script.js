@@ -612,7 +612,7 @@ function updateTimer() {
         loadUserCodes();
     }
 
-    const fd = (number, targetLength = 2) => number.toString().padStart('0', targetLength);
+    const fd = (number) => number.toString();
 
     const daysDiv = $('#days');
     const hoursDiv = $('#hours');
