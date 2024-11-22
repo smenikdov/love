@@ -28,8 +28,9 @@ let currentMonth = {
     name: 'january',
 };
 
-let codes = [];
-let currentTime = new Date();
+let codes = null;
+let currentTime = null;
+let isCodesLoading = false;
 
 // Set mask for leaf holder
 
@@ -573,36 +574,43 @@ function declineWord(number, word1, word2, word5) {
 }
 
 function updateTimer() {
+    if (!codes) {
+        return;
+    }
+
+    currentTime += 1000;
+
     const timerDiv = $('#timer');
     const codeDiv = $('#code');
 
     const monthIndex = months.findIndex(m => m.name === currentMonth.name);
-    if (codes[monthIndex]) {
+    if (codes[monthIndex].code) {
         timerDiv.css('display', 'none');
         codeDiv.css('display', 'flex');
         const code1 = $('#code_1');
         const code2 = $('#code_2');
         const code3 = $('#code_3');
         const code4 = $('#code_4');
-        code1.text(codes[monthIndex][0]);
-        code2.text(codes[monthIndex][1]);
-        code3.text(codes[monthIndex][2]);
-        code4.text(codes[monthIndex][3]);
+        code1.text(codes[monthIndex].code[0]);
+        code2.text(codes[monthIndex].code[1]);
+        code3.text(codes[monthIndex].code[2]);
+        code4.text(codes[monthIndex].code[3]);
         return;
     }
 
-    const targetDate = new Date(2025, monthIndex, 1);
-
-    const result = timeUntil(targetDate);
-
     timerDiv.css('display', 'flex');
     codeDiv.css('display', 'none');
+    const result = timeUntil(codes[monthIndex].availableFrom);
     const {
         days,
         hours,
         minutes,
         seconds
     } = result;
+
+    if (days === 0 && hours === 0 && minutes === 0 && seconds === 0) {
+        loadUserCodes();
+    }
 
     const fd = (number, targetLength = 2) => number.toString().padStart('0', targetLength);
 
@@ -784,6 +792,11 @@ function changeWeather(month) {
 }
 
 function loadUserCodes() {
+    if (isCodesLoading) {
+        return;
+    }
+    isCodesLoading = true;
+
     fetch('codes.php')
         .then(response => {
             if (!response.ok) {
@@ -792,11 +805,19 @@ function loadUserCodes() {
             return response.json();
         })
         .then(data => {
-            codes = data.codes;
+            codes = data.codes.map(c => {
+                return {
+                    code: c.code,
+                    availableFrom: new Date(c.availableFrom),
+                };
+            });
             currentTime = new Date(data.currentTime).getTime();
         })
         .catch(error => {
             console.error('Произошла ошибка:', error);
             alert('Не удалось загрузить список кодов, простите (');
+        })
+        .finally(() => {
+            isCodesLoading = false;
         });
 }

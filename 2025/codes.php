@@ -2,44 +2,36 @@
 header('Content-Type: application/json');
 
 $codes = [
-    0 => "1234",
-    1 => "4353",
-    2 => "2545",
-    3 => "2545",
-    4 => "2545",
-    5 => "2545",
-    6 => "2545",
-    7 => "2545",
-    8 => "2545",
-    9 => "2545",
-    10 => "2545",
-    11 => "2545"
+    ['code' => '1234', 'availableFrom' => new DateTime('2025-01-01', new DateTimeZone('Asia/Yekaterinburg'))],
+    ['code' => '1234', 'availableFrom' => new DateTime('2025-02-01', new DateTimeZone('Asia/Yekaterinburg'))],
+    ['code' => '1234', 'availableFrom' => new DateTime('2025-03-01', new DateTimeZone('Asia/Yekaterinburg'))],
+    ['code' => '1234', 'availableFrom' => new DateTime('2025-04-01', new DateTimeZone('Asia/Yekaterinburg'))],
+    ['code' => '1234', 'availableFrom' => new DateTime('2025-05-01', new DateTimeZone('Asia/Yekaterinburg'))],
+    ['code' => '1234', 'availableFrom' => new DateTime('2025-06-01', new DateTimeZone('Asia/Yekaterinburg'))],
+    ['code' => '1234', 'availableFrom' => new DateTime('2025-07-01', new DateTimeZone('Asia/Yekaterinburg'))],
+    ['code' => '1234', 'availableFrom' => new DateTime('2025-08-01', new DateTimeZone('Asia/Yekaterinburg'))],
+    ['code' => '1234', 'availableFrom' => new DateTime('2025-09-01', new DateTimeZone('Asia/Yekaterinburg'))],
+    ['code' => '1234', 'availableFrom' => new DateTime('2025-10-01', new DateTimeZone('Asia/Yekaterinburg'))],
+    ['code' => '1234', 'availableFrom' => new DateTime('2025-10-01', new DateTimeZone('Asia/Yekaterinburg'))],
+    ['code' => '1234', 'availableFrom' => new DateTime('2025-12-01', new DateTimeZone('Asia/Yekaterinburg'))],
 ];
 
 // возвращает номер месяца (1–12)
 $currentMonth = date('n');
-// Текущий год
-$currentYear = date('Y');
 
 // $currentTime = date('Y-m-d H:i:s');
-$currentTime = gmdate('Y-m-d\TH:i:s\Z');
+$currentTime = new DateTime('now', new DateTimeZone('Asia/Yekaterinburg'));
 
-$filteredCodes = [];
-
-if ($currentYear < 2025) {
-    $filteredCodes = [];
-} elseif ($currentYear > 2025) {
-    $filteredCodes = $codes;
-} else {
-    // Фильтруем массив, оставляя только те коды, где месяц уже наступил
-    $filteredCodes = array_filter($codes, function($code, $index) use ($currentMonth) {
-        return $index + 1 < $currentMonth;
-    }, ARRAY_FILTER_USE_BOTH);
-}
+$filteredCodes = array_map(function ($item) use ($currentTime) {
+    return [
+        'code' => $item['availableFrom'] <= $currentTime ? $item['code'] : null,
+        'availableFrom' => $item['availableFrom']->format('Y-m-d\TH:i:s\Z'),
+    ];
+}, $codes);
 
 $response = [
     "codes" => $filteredCodes,
-    "currentTime" => $currentTime
+    "currentTime" => $currentTime->format('Y-m-d\TH:i:s\Z')
 ];
 
 echo json_encode($response);
